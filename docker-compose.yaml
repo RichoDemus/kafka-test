@@ -15,3 +15,11 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager
+    ports:
+      - "80:9000"
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+      APPLICATION_SECRET: "pass"
