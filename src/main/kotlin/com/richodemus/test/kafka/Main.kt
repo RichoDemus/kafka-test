@@ -1,16 +1,23 @@
 import com.richodemus.test.kafka.AdditionConsumer
 import com.richodemus.test.kafka.InitialProducer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+val logger: Logger = LoggerFactory.getLogger("Main")
 
 fun main(args: Array<String>) {
+    logger.info("Starting...")
     val threadPool = Executors.newCachedThreadPool()
 
-    val producer = InitialProducer("test", 10)
-    val consumer = AdditionConsumer("test", 10)
+    val messages = 10
+    val producer = InitialProducer("test", messages)
+    val consumer = AdditionConsumer("test", messages)
 
-    threadPool.execute(consumer)
+
+    Thread.sleep(1000L)
+    logger.info("Executing producer...")
     threadPool.execute(producer)
 
     threadPool.shutdown()
