@@ -12,8 +12,9 @@ fun main(args: Array<String>) {
     val threadPool = Executors.newCachedThreadPool()
 
     val messages = 10
-    val producer = InitialProducer("test", messages)
-    val consumer = AdditionConsumer("test", messages)
+    val topic = "test"
+    val producer = InitialProducer(topic, messages)
+    val consumer = AdditionConsumer(topic, messages)
 
 
     Thread.sleep(1000L)

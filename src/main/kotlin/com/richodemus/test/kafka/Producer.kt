@@ -8,7 +8,7 @@ import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.serialization.StringSerializer
 import java.util.Properties
 
-internal class Producer {
+internal class Producer(private val topic: String) {
     private val mapper = jacksonObjectMapper()
     private val producer: KafkaProducer<String, String>
 
@@ -24,7 +24,7 @@ internal class Producer {
 
     fun send(key: String, message: Message): RecordMetadata? {
         val json = mapper.writeValueAsString(message)
-        val record: ProducerRecord<String, String> = ProducerRecord("test", key, json)
+        val record: ProducerRecord<String, String> = ProducerRecord(topic, key, json)
 
         return producer.send(record).get()
     }

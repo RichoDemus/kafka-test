@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import java.util.Properties
 import java.util.UUID
 
-internal class Consumer(private val messageListener: (Message) -> Unit) {
+internal class Consumer(topic: String, private val messageListener: (Message) -> Unit) {
     private val logger = LoggerFactory.getLogger(javaClass.name)
     private val mapper = jacksonObjectMapper()
     private val consumer: KafkaConsumer<String, String>
@@ -24,7 +24,7 @@ internal class Consumer(private val messageListener: (Message) -> Unit) {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString())
         consumer = KafkaConsumer(props)
 
-        consumer.subscribe(listOf("test"))
+        consumer.subscribe(listOf(topic))
 
         Thread {
             while (running) {

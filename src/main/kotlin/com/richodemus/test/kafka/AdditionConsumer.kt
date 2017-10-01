@@ -3,16 +3,16 @@ package com.richodemus.test.kafka
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-internal class AdditionConsumer(private val topic: String, private val messagesToConsume: Int) {
+internal class AdditionConsumer(topic: String, private val messagesToConsume: Int) {
     private val logger = LoggerFactory.getLogger(javaClass.name)
 
     private val consumer: Consumer
-    private val producer = Producer()
+    private val producer = Producer(topic)
 
     init {
         var numberOfDoneMessages = 0
         logger.info("Time to consume!")
-        consumer = Consumer { message ->
+        consumer = Consumer(topic) { message ->
             val newMessage = message.copy(counter = message.counter + 1)
             val id = UUID.randomUUID().toString()
 

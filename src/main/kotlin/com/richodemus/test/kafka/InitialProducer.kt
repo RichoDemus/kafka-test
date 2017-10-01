@@ -3,9 +3,9 @@ package com.richodemus.test.kafka
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-internal class InitialProducer(private val topic: String, private val messagesToCreate: Int) : Runnable {
+internal class InitialProducer(topic: String, private val messagesToCreate: Int) : Runnable {
     private val logger = LoggerFactory.getLogger(javaClass.name)
-    private val producer: Producer = Producer()
+    private val producer: Producer = Producer(topic)
 
     override fun run() {
         logger.info("Time to produce!")
