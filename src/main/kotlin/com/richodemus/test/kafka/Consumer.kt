@@ -36,7 +36,7 @@ internal class Consumer(topic: String, private val messageListener: (Message) ->
                 }
 
                 records.map {
-                    logger.info("Received: {}: {}", it.key(), it.value())
+                    logger.debug("Received: {}: {}", it.key(), it.value())
                     it.value()
                 }
                         .map { mapper.readValue<Message>(it) }

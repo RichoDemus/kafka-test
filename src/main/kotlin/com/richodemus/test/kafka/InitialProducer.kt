@@ -12,7 +12,7 @@ internal class InitialProducer(topic: String, private val messagesToCreate: Int)
         IntRange(1, messagesToCreate).forEach {
             val id = UUID.randomUUID().toString()
 
-            val recordMetadata = producer.send(id, Message(id, 1))
+            val recordMetadata = producer.send(id, Message(id, listOf("Producer")))
         }
         producer.close()
     }
