@@ -7,9 +7,13 @@ internal class NonProducingConsumer(sourceTopic: String, private val messagesToC
 
     private val consumer: Consumer
 
+    var running = false
+        private set
+
     init {
         var messages = 0
         logger.info("Time to consume!")
+        running = true
         consumer = Consumer(sourceTopic) { message ->
             logger.info("Consumed: {}", message)
             messages++
@@ -20,6 +24,7 @@ internal class NonProducingConsumer(sourceTopic: String, private val messagesToC
     }
 
     private fun stop() {
+        running = false
         consumer.stop()
     }
 }
