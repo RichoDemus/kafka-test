@@ -18,8 +18,8 @@ fun main(args: Array<String>) {
     val stream = Stream("C", "D")
 
 
-    val messages = 10
-    val producer = InitialProducer("A", messages)
+    val messages = 100
+    val producer = InitialProducer("A", 1)
     val workers = listOf(
             Pair("A", "B"),
             Pair("B", "C"),
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
             Pair("E", "F"),
             Pair("F", "G")
     )
-            .map { AdditionConsumer("${it.first}->${it.second}", it.first, it.second, messages) }
+            .map { AdditionConsumer("${it.first}->${it.second}", it.first, it.second) }
 
     val consumer = NonProducingConsumer("G", messages)
 
@@ -41,6 +41,7 @@ fun main(args: Array<String>) {
         Thread.sleep(10L)
     }
 
+    workers.forEach(AdditionConsumer::stop)
 
     threadPool.shutdown()
     threadPool.awaitTermination(1, TimeUnit.HOURS)

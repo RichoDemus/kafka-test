@@ -9,6 +9,9 @@ internal class InitialProducer(topic: String, private val messagesToCreate: Int)
 
     override fun run() {
         logger.info("Time to produce!")
+        if(messagesToCreate < 1) {
+            return
+        }
         IntRange(1, messagesToCreate).forEach {
             val id = UUID.randomUUID().toString()
 
