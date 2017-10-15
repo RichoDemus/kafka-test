@@ -7,7 +7,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
 import java.util.Properties
-import java.util.UUID
 
 internal class Consumer(topic: String, private val messageListener: (Message) -> Unit) {
     private val logger = LoggerFactory.getLogger(javaClass.name)
@@ -21,7 +20,8 @@ internal class Consumer(topic: String, private val messageListener: (Message) ->
         props.put(ConsumerConfig.CLIENT_ID_CONFIG, "KafkaExampleConsumer")
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString())
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, topic)
         consumer = KafkaConsumer(props)
 
         consumer.subscribe(listOf(topic))
