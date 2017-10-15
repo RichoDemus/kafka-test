@@ -2,7 +2,7 @@
 ## Running
 ```
 docker-compose up -d
-run Main.kt
+run Main.kt or StreamMain.kt
 ```
 ## Examples
 in Main.kt there is an example using the producer and consumer api  
