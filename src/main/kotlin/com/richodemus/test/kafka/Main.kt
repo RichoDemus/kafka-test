@@ -1,7 +1,7 @@
 
-import com.richodemus.test.kafka.AdditionConsumer
 import com.richodemus.test.kafka.InitialProducer
 import com.richodemus.test.kafka.NonProducingConsumer
+import com.richodemus.test.kafka.TopicToTopicMessageShuffler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
     logger.info("Starting...")
     val threadPool = Executors.newCachedThreadPool()
 
-    val messages = 100
+    val messages = 10
     val producer = InitialProducer("A", messages)
 
     // we create a bunch of workers who simply shuffle messages from one topic to the other and adds their name to the message
@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
             Pair("E", "F"),
             Pair("F", "G")
     )
-            .map { AdditionConsumer("${it.first}->${it.second}", it.first, it.second) }
+            .map { TopicToTopicMessageShuffler("${it.first}->${it.second}", it.first, it.second) }
 
     // The last consumer just consumes until it has received a set amount of messages
     val consumer = NonProducingConsumer("G", messages)
@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
         Thread.sleep(10L)
     }
 
-    workers.forEach(AdditionConsumer::stop)
+    workers.forEach(TopicToTopicMessageShuffler::stop)
 
     threadPool.shutdown()
     threadPool.awaitTermination(1, TimeUnit.HOURS)

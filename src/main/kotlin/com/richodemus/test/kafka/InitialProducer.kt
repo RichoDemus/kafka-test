@@ -3,6 +3,9 @@ package com.richodemus.test.kafka
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
+/**
+ * Produces messages to a defined topic
+ */
 internal class InitialProducer(topic: String, private val messagesToCreate: Int) : Runnable {
     private val logger = LoggerFactory.getLogger(javaClass.name)
     private val producer: Producer = Producer(topic)

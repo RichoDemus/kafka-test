@@ -2,6 +2,9 @@ package com.richodemus.test.kafka
 
 import org.slf4j.LoggerFactory
 
+/**
+ * Simply consumes messages from a topic and stops after it has consumed a defined amount
+ */
 internal class NonProducingConsumer(sourceTopic: String, private val messagesToConsume: Int) {
     private val logger = LoggerFactory.getLogger(javaClass.name)
 

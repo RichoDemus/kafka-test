@@ -10,6 +10,9 @@ import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.KStreamBuilder
 import java.util.Properties
 
+/**
+ * Helper class to set up a stream
+ */
 class Stream(sourceTopic: String, destinationTopic: String) {
     private val kafkaStreams: KafkaStreams
     init {

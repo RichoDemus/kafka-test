@@ -8,6 +8,9 @@ import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.serialization.StringSerializer
 import java.util.Properties
 
+/**
+ * Helper class to produce messages top a topic
+ */
 internal class Producer(private val topic: String) {
     private val mapper = jacksonObjectMapper()
     private val producer: KafkaProducer<String, String>

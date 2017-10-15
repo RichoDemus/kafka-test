@@ -10,6 +10,8 @@ import java.util.Properties
 /**
  * this example is intended to use the kafka console producer to put strings into the topic source:
  * ./kafka-console-producer.sh -oker-list localhost:9092 --topic source
+ * and to view what's actually happening, use the console consumer:
+ * ./kafka-console-consumer.sh --bootstrap-server localhost:9092  --whitelist ".*"  --from-beginning
  */
 fun main(args: Array<String>) {
 
