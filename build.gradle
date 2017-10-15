@@ -1,6 +1,5 @@
 apply plugin: 'kotlin'
 apply plugin: 'com.github.ben-manes.versions'
-apply plugin: 'ca.cutterslade.analyze'
 
 dependencies {
     compile 'org.jetbrains.kotlin:kotlin-runtime:1.1.51'
@@ -13,8 +12,8 @@ dependencies {
     compile 'org.apache.kafka:kafka-clients:0.11.0.1'
     compile 'org.apache.kafka:kafka-streams:0.11.0.1'
 
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.1'
-    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2'
 }
 
 repositories {
@@ -27,7 +26,6 @@ buildscript {
     }
     dependencies {
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.51'
-        classpath 'ca.cutterslade.gradle:gradle-dependency-analyze:1.2.1'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
     }
 }

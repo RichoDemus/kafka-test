@@ -7,15 +7,19 @@ import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.KStreamBuilder
 import java.util.Properties
 
+/**
+ * this example is intended to use the kafka console producer to put strings into the topic source:
+ * ./kafka-console-producer.sh -oker-list localhost:9092 --topic source
+ */
 fun main(args: Array<String>) {
 
     val sourceTopic = "source"
     val intemediate = "intermediate"
     val destinationTopic = "destination"
 
-
-    val stream = SimpleStream(sourceTopic, intemediate)
-    val stream2 = SimpleStream(intemediate, destinationTopic)
+    // create two streams to shuffle and modify the data
+    val stream = SimpleStream(sourceTopic, intemediate) {it.toUpperCase()}
+    val stream2 = SimpleStream(intemediate, destinationTopic) {it.replace(" ", "_")}
 
 
 
@@ -24,7 +28,7 @@ fun main(args: Array<String>) {
     Runtime.getRuntime().addShutdownHook(Thread(stream2::close))
 }
 
-private class SimpleStream(source: String, destination: String) {
+private class SimpleStream(source: String, destination: String, function: (String) -> String) {
     val kafkaStreams: KafkaStreams
     init {
         val builder = KStreamBuilder()
@@ -38,7 +42,9 @@ private class SimpleStream(source: String, destination: String) {
 
         val stream = builder.stream<String, String>(source)
 
-        stream.peek { key, value ->  println("Shuffling $value from $source to $destination")}.to(destination)
+        stream.peek { key, value ->  println("Shuffling $value from $source to $destination")}
+                .mapValues(function)
+                .to(destination)
 
         kafkaStreams = KafkaStreams(builder, config)
         kafkaStreams.start()
