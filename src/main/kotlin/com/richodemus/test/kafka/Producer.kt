@@ -17,7 +17,7 @@ internal class Producer(private val topic: String) {
 
     init {
         val props = Properties()
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "35.189.72.224:9092")
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "KafkaExampleProducer")
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)

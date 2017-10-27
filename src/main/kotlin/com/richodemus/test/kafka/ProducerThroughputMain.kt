@@ -10,7 +10,7 @@ import kotlin.system.measureTimeMillis
  */
 fun main(args: Array<String>) {
     val producer = Producer("dump")
-    val numberOfMessages = 1_000_000
+    val numberOfMessages = 10
     val executor = Executors.newFixedThreadPool(1000)
 
     val stream = IntRange(1, numberOfMessages)
