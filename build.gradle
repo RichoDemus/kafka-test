@@ -15,6 +15,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.2'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2'
+    compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.0'
 
     testCompile 'junit:junit:4.1'
     testCompile 'org.assertj:assertj-core:3.8.0'
