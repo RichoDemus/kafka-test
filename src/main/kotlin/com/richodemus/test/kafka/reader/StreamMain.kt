@@ -48,7 +48,6 @@ private data class EventDTO(val id: String,
 
 // old events
 private data class CreateUserEvent(val eventId: String, val type: OldEventTypes, val userId: String, val username: String, val password: String)
-
 private data class CreateLabelEvent(val eventId: String, val type: OldEventTypes, val userId: String, val labelId: String, val labelName: String)
 private data class AddFeedToLabel(val eventId: String, val type: OldEventTypes, val labelId: String, val feedId: String)
 private data class UserSubscribedToFeed(val eventId: String, val type: OldEventTypes, val userId: String, val feedId: String)
@@ -69,7 +68,6 @@ private data class NewLabelCreatedEvent(val id: String,
                                         val userId: String,
                                         val labelId: String,
                                         val labelName: String)
-
 
 private data class NewFeedAddedToLabelEvent(val id: String,
                                             val timestamp: String,
