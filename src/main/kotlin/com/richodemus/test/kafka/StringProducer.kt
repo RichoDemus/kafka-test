@@ -25,8 +25,8 @@ internal class StringProducer(private val topic: String) {
         producer = KafkaProducer(props)
     }
 
-    fun send(key: String, message: String): RecordMetadata? {
-        val record: ProducerRecord<String, String> = ProducerRecord(topic, key, message)
+    fun send(key: String, message: String?): RecordMetadata? {
+        val record: ProducerRecord<String, String?> = ProducerRecord(topic, key, message)
 
         return producer.send(record).get()
     }
