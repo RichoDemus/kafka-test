@@ -1,26 +1,20 @@
 package com.richodemus.test.kafka.ktable
 
-import com.richodemus.test.kafka.StringProducer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
-import org.apache.kafka.streams.errors.InvalidStateStoreException
 import org.apache.kafka.streams.kstream.Materialized
-import org.apache.kafka.streams.state.QueryableStoreType
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import java.util.Properties
 import java.util.UUID
-import java.util.concurrent.ThreadLocalRandom
+import java.util.regex.Pattern
 import kotlin.concurrent.thread
 
-
-/**
- * ./bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic source --replication-factor 1 --partitions 1
- */
 fun main(args: Array<String>) {
-    val topic = "source"
+    val topic = "events_v2"
 
     // Lots of config
     val streamsConfiguration = Properties()
@@ -37,12 +31,22 @@ fun main(args: Array<String>) {
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
     val builder = StreamsBuilder()
-    val streamOfUUIDs = builder.stream<String, String>(topic)
+    val readerEvents = builder.stream<String, String>(topic)
 
+    //language=REGEXP
+    val pattern = "\"id\":\"(.*?)\""
+    Pattern.compile(pattern)
     // turn the stream of UUIDs into a key value table
-    val table = streamOfUUIDs
+    val table = readerEvents
+            .filter { _, value -> value.contains("LABEL_CREATED") }
+            .map { key, value ->
+                println("peek. Key: $key\tvalue: $value")
+                KeyValue(key, value)
+            }
             .groupByKey()
             .reduce({ _, right -> right }, Materialized.`as`("materialized"))
+//            .groupByKey()
+//            .reduce({ _, right -> right }, Materialized.`as`("materialized"))
 
 
     val streams = KafkaStreams(builder.build(), streamsConfiguration)
@@ -53,15 +57,15 @@ fun main(args: Array<String>) {
     Runtime.getRuntime().addShutdownHook(Thread(streams::close))
 
 
-    // post a UUID to a random key every 100ms
-    thread(isDaemon = true) {
-        val producer = StringProducer(topic)
-        val keys = listOf("one", "two", "three", "four", "five", "sex")
-        while (true) {
-            producer.send(keys.takeRandom(), UUID.randomUUID().toString())
-            Thread.sleep(100L)
-        }
-    }
+//    // post a UUID to a random key every 100ms
+//    thread(isDaemon = true) {
+//        val producer = StringProducer(topic)
+//        val keys = listOf("one", "two", "three", "four", "five", "sex")
+//        while (true) {
+//            producer.send(keys.takeRandom(), UUID.randomUUID().toString())
+//            Thread.sleep(100L)
+//        }
+//    }
 
     // print the key value store every second
     thread(isDaemon = true) {
@@ -78,22 +82,4 @@ fun main(args: Array<String>) {
 
     System.`in`.read()
     streams.close()
-}
-
-internal fun <E> List<E>.takeRandom(): E {
-    return this[ThreadLocalRandom.current().nextInt(size)]
-}
-
-internal fun <T> waitUntilStoreIsQueryable(storeName: String,
-                                  queryableStoreType: QueryableStoreType<T>,
-                                  streams: KafkaStreams): T {
-    while (true) {
-        try {
-            return streams.store(storeName, queryableStoreType)
-        } catch (ignored: InvalidStateStoreException) {
-            // store not yet ready for querying
-            Thread.sleep(100)
-        }
-
-    }
 }

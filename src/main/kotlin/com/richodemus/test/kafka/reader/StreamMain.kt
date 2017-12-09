@@ -18,7 +18,7 @@ import java.util.Properties
 import java.util.UUID
 
 /**
- * ./kafka-topics.sh --zookeeper localhost:2181 --create --topic temp --replication-factor 1 --partitions 1
+ * ./kafka_2.11-1.0.0/bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic events_v2 --partitions 1 --replication-factor 1 --config retention.ms=-1
  */
 fun main(args: Array<String>) {
     val config = Properties()
@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     val events = builder.stream<String, String>("events")
 
 
-    events.mapValues { transform(it) }.to("temp")
+    events.mapValues { transform(it) }.to("events_v2")
 
     val streams = KafkaStreams(builder.build(), config)
     streams.start()
