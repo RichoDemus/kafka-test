@@ -1,12 +1,5 @@
 package com.richodemus.test.kafka.serde
 
-import com.richodemus.test.kafka.reader.NewEventTypes.FEED_ADDED_TO_LABEL
-import com.richodemus.test.kafka.reader.NewEventTypes.LABEL_CREATED
-import com.richodemus.test.kafka.reader.NewEventTypes.PASSWORD_CHANGED
-import com.richodemus.test.kafka.reader.NewEventTypes.USER_CREATED
-import com.richodemus.test.kafka.reader.NewEventTypes.USER_SUBSCRIBED_TO_FEED
-import com.richodemus.test.kafka.reader.NewEventTypes.USER_UNWATCHED_ITEM
-import com.richodemus.test.kafka.reader.NewEventTypes.USER_WATCHED_ITEM
 import com.richodemus.test.kafka.reader.NewFeedAddedToLabelEvent
 import com.richodemus.test.kafka.reader.NewLabelCreatedEvent
 import com.richodemus.test.kafka.reader.NewUserCreatedEvent
@@ -18,16 +11,16 @@ import java.util.UUID.randomUUID
 
 
 fun main(args: Array<String>) {
-    val topic = "asdf"
+    val topic = "test"
     val consumer = SerdeConsumer(topic) {
-        when (it.type()) {
-            USER_CREATED -> println("User Created: ${it as NewUserCreatedEvent}")
-            PASSWORD_CHANGED -> TODO()
-            LABEL_CREATED -> println("Label Created: ${it as NewLabelCreatedEvent}")
-            FEED_ADDED_TO_LABEL -> println("Feed Added To Label: ${it as NewFeedAddedToLabelEvent}")
-            USER_SUBSCRIBED_TO_FEED -> println("User Subscribed to Feed: ${it as NewUserSubscribedToFeed}")
-            USER_WATCHED_ITEM -> println("User Watch Item: ${it as NewUserWatchedItemEvent}")
-            USER_UNWATCHED_ITEM -> println("User Unwatched Item: ${it as NewUserUnwatchedItemEvent}")
+        when (it) {
+            is NewUserCreatedEvent -> println("User Created: $it")
+            is NewLabelCreatedEvent -> println("Label Created: $it")
+            is NewFeedAddedToLabelEvent -> println("Feed Added To Label: $it")
+            is NewUserSubscribedToFeed -> println("User Subscribed to Feed: $it")
+            is NewUserWatchedItemEvent -> println("User Watch Item: $it")
+            is NewUserUnwatchedItemEvent -> println("User Unwatched Item: $it")
+            else -> println("Unknown messagetype ${it.javaClass}")
         }
     }
 
@@ -40,6 +33,7 @@ fun main(args: Array<String>) {
             NewUserWatchedItemEvent("id5", ZonedDateTime.now(), "userId", "feedId", "itemId"),
             NewUserUnwatchedItemEvent("id6", ZonedDateTime.now(), "userId", "feedId", "itemId")
     )
+    Thread.sleep(2000L)
     input.forEach { producer.send(randomUUID().toString(), it) }
 
     System.`in`.read()
