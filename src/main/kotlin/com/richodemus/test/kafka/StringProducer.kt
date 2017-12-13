@@ -6,12 +6,14 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.serialization.StringSerializer
+import java.io.Closeable
 import java.util.Properties
+import java.util.UUID
 
 /**
  * Helper class to produce messages top a topic
  */
-internal class StringProducer(private val topic: String) {
+internal class StringProducer(private val topic: String) : Closeable {
     private val mapper = jacksonObjectMapper()
     private val producer: KafkaProducer<String, String>
 
@@ -25,13 +27,15 @@ internal class StringProducer(private val topic: String) {
         producer = KafkaProducer(props)
     }
 
+    fun send(message: String?) = send(UUID.randomUUID().toString(), message)
+
     fun send(key: String, message: String?): RecordMetadata? {
         val record: ProducerRecord<String, String?> = ProducerRecord(topic, key, message)
 
         return producer.send(record).get()
     }
 
-    fun close() {
+    override fun close() {
         producer.flush()
         producer.close()
     }

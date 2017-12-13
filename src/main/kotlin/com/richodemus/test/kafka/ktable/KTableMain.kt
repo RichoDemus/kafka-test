@@ -54,8 +54,8 @@ fun main(args: Array<String>) {
 
 
     // post a UUID to a random key every 100ms
+    val producer = StringProducer(topic)
     thread(isDaemon = true) {
-        val producer = StringProducer(topic)
         val keys = listOf("one", "two", "three", "four", "five", "sex")
         while (true) {
             producer.send(keys.takeRandom(), UUID.randomUUID().toString())
@@ -68,8 +68,10 @@ fun main(args: Array<String>) {
         val queryableStoreName = table.queryableStoreName()
         while (true) {
             val view = waitUntilStoreIsQueryable(queryableStoreName, QueryableStoreTypes.keyValueStore<String, String>(), streams)
-            view.all().forEach {
-                println("State: key: ${it.key},\tvalue: ${it.value}")
+            view.all().use { // we need to close the iterator so lets use `use`
+                it.forEach {
+                    println("State: key: ${it.key},\tvalue: ${it.value}")
+                }
             }
             println()
             Thread.sleep(1000L)
@@ -78,6 +80,7 @@ fun main(args: Array<String>) {
 
     System.`in`.read()
     streams.close()
+    producer.close()
 }
 
 internal fun <E> List<E>.takeRandom(): E {
@@ -85,8 +88,8 @@ internal fun <E> List<E>.takeRandom(): E {
 }
 
 internal fun <T> waitUntilStoreIsQueryable(storeName: String,
-                                  queryableStoreType: QueryableStoreType<T>,
-                                  streams: KafkaStreams): T {
+                                           queryableStoreType: QueryableStoreType<T>,
+                                           streams: KafkaStreams): T {
     while (true) {
         try {
             return streams.store(storeName, queryableStoreType)
