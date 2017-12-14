@@ -28,7 +28,10 @@ class AggregateDeserializer : Deserializer<Aggregate> {
     override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {
     }
 
-    override fun deserialize(topic: String?, data: ByteArray): Aggregate {
+    override fun deserialize(topic: String?, data: ByteArray?): Aggregate {
+        if (data == null) {
+            return Aggregate()
+        }
         return mapper.readValue(data)
     }
 

@@ -6,10 +6,9 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Materialized
-import org.apache.kafka.streams.kstream.TimeWindows
 import java.util.Properties
 import java.util.UUID
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
  * to create topic for this run: ./bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic events --replication-factor 1 --partitions 1
@@ -31,7 +30,7 @@ fun main(args: Array<String>) {
     config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, EventSerde().javaClass)
     config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
-    val results = mutableListOf<Result>()
+    val results = ConcurrentLinkedQueue<Result>()
 
     val builder = StreamsBuilder()
     /*
@@ -46,11 +45,7 @@ fun main(args: Array<String>) {
             which is basically a stream of key-multivalue pairs like
             Stream<UserId, List<Events>>
              */
-            .groupBy { key, _ -> key }
-            /*
-            windowing is how long backwards in time we will look when aggregating
-             */
-            .windowedBy(TimeWindows.of(TimeUnit.DAYS.toMillis(1)))
+            .groupByKey()
             /*
             Merge all events for a user by storing them in an container dto class thing
             this turns the KGroupedStream into a KTable, which is basically a key-value store like
@@ -77,9 +72,7 @@ fun main(args: Array<String>) {
             but let just save them in memory
              */
             .foreach { _, value ->
-                synchronized(results) {
-                    results.add(value)
-                }
+                results.add(value)
             }
 
     val streams = KafkaStreams(builder.build(), config)
@@ -92,13 +85,16 @@ fun main(args: Array<String>) {
     produceSomeEvents(topic)
 
     println("waiting...")
-    while (results.size < 3) {
-        Thread.sleep(100L)
+    var printedResults = 0
+    while (printedResults < 3) {
+        results.poll()?.let {
+            println("Result: $it")
+            printedResults++
+        }
+        Thread.sleep(10L)
     }
-    println()
-    results.forEach {
-        println("Result: $it")
-    }
+
+    println("Done...")
     streams.close()
 }
 
@@ -107,6 +103,7 @@ private fun produceSomeEvents(topic: String) {
         val richo = "richo"
         val ohcir = "ohcir"
         val sven = "sven"
+        producer.send("incomplete", Name("incomplete", "incomplete"))
         producer.send(sven, PhoneNumber(sven, "00000"))
         producer.send(richo, Name(richo, "Richard"))
         producer.send(sven, Name(sven, "Sven"))
