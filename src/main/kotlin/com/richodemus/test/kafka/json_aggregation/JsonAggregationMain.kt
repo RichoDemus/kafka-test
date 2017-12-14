@@ -42,20 +42,20 @@ fun main(args: Array<String>) {
             /*
             group messages by key (which is user id in our case)
             this will turn the stream into a KGroupedStream
-            which is basically a stream of key-multivalue pairs like
+            which is basically a stream of key-multivalue with the signature
             Stream<UserId, List<Events>>
              */
             .groupByKey()
             /*
             Merge all events for a user by storing them in an container dto class thing
-            this turns the KGroupedStream into a KTable, which is basically a key-value store like
+            this turns the KGroupedStream into a KTable, which is basically a key-value with the signature
             Map<UserId, Aggregate>
              */
             .aggregate({ Aggregate() }, { _, value, aggregate ->
                 aggregate.copy(value)
             }, Materialized.with(Serdes.String(), AggregateSerde()))
             /*
-            turns the KTable into a normal Kstream again like
+            turns the KTable into a normal Kstream with the signature
             Stream<Aggregate>
              */
             .toStream()
